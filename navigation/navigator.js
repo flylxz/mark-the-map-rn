@@ -9,13 +9,17 @@ export const MainStack = () => {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerShown: false,
-        // headerTransparent: true,
+        // headerShown: false,
+        headerTransparent: true,
         // headerBlurEffect: 'systemChromeMaterial',
         animation: 'fade',
         // presentation: 'fullScreenModal',
       }}>
-      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{headerShown: false}}
+      />
       <Stack.Screen name="Map" component={MapScreen} />
     </Stack.Navigator>
   );

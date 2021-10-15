@@ -1,5 +1,5 @@
-import React, {useRef} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {Platform, StyleSheet, Text, View} from 'react-native';
 
 import MapView, {
   Marker,
@@ -12,27 +12,51 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {SideBar} from '../components/SideBar';
 
-import icons from '../constants/icons';
+import images from '../constants/images';
+import {useGetHouseByIdQuery} from '../service/house';
+import {editMarker} from '../store/houseSlice';
 import {openModalAdd, openModalEdit} from '../store/modalSlice';
 
 export const MapScreen = ({route}) => {
-  const {initialRegion, markers} = useSelector(state => state.markers);
+  const house = route.params.item;
+  const {data, error, isLoading} = useGetHouseByIdQuery(house.id);
+
+  // const {houses} = useSelector(state => state.houses);
   const dispatch = useDispatch();
 
   const mapRef = useRef(null);
-  const calloutRef = useRef([]);
+  const markerRef = useRef([]);
+
+  // const [[northWest, southEast], setBounds] = useState();
+  const [[northWest, southEast], setBounds] = useState([]);
 
   const calculateBounds = () => {
     return [
       {
-        latitude: +(initialRegion.latitude + 0.002).toFixed(14),
-        longitude: +(initialRegion.longitude - 0.002).toFixed(14),
+        latitude: (+house?.initialRegion?.latitude + 0.002).toFixed(14),
+        longitude: (+house?.initialRegion?.longitude - 0.002).toFixed(14),
       },
       {
-        latitude: +(initialRegion.latitude - 0.002).toFixed(14),
-        longitude: +(initialRegion.longitude + 0.002).toFixed(14),
+        latitude: (+house?.initialRegion?.latitude - 0.002).toFixed(14),
+        longitude: (+house?.initialRegion?.longitude + 0.002).toFixed(14),
       },
     ];
+  };
+
+  useEffect(() => {
+    setBounds(calculateBounds());
+  }, [data]);
+
+  const checkOutBounds = ({latitude, longitude}) => {
+    if (
+      latitude >= northWest.latitude ||
+      latitude <= southEast.latitude ||
+      longitude >= southEast.longitude ||
+      longitude <= northWest.longitude
+    ) {
+      return true;
+    }
+    return false;
   };
 
   const mapStyle = [
@@ -54,36 +78,72 @@ export const MapScreen = ({route}) => {
     });
   };
 
+  if (isLoading) {
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View>
+        <Text>Error...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.screen}>
       <MapView
+        userInterfaceStyle="dark"
         customMapStyle={mapStyle}
         ref={map => (mapRef.current = map)}
         style={styles.screen}
         mapType="standard"
         provider={PROVIDER_GOOGLE}
-        initialRegion={initialRegion}
-        onMapReady={() => mapRef.current.setMapBoundaries(...calculateBounds())}
-        // showsMyLocationButton={true}
+        initialRegion={house.initialRegion}
+        // onMapReady={() => mapRef.current.setMapBoundaries(...calculateBounds())}
+        // onMapReady={() =>
+        //   mapRef.current.setMapBoundaries([northWest, southEast])
+        // }
         minZoomLevel={17}
-        // maxZoomLevel={15}
         onLongPress={e => {
-          // console.log(e.nativeEvent);
-          dispatch(openModalAdd(e.nativeEvent.coordinate));
+          if (checkOutBounds(e.nativeEvent.coordinate)) {
+            console.log('out of bounds');
+          } else {
+            dispatch(
+              openModalAdd({id: house.id, coords: e.nativeEvent.coordinate}),
+            );
+          }
         }}
-        zoomControlEnabled={true}>
-        {markers.map((mark, idx) => (
+        zoomControlEnabled={true}
+        rotateEnabled={false}>
+        {house.markers.map((mark, idx) => (
           <Marker
             key={mark.id}
+            ref={el => (markerRef.current[idx] = el)}
             coordinate={mark.coords}
+            // flat={true}
             title={mark.title}
             description={mark.description}
             draggable
-            // onPress={e => openModal(e, mark)}
-            // onDragStart={()=>openModal(mark)}
-            // onDragEnd={e => onDragEnd(mark.id, e.nativeEvent.coordinate)}
-            ref={el => (calloutRef.current[idx] = el)}
-            onCalloutPress={() => calloutRef.current[idx].hideCallout()}>
+            // onDragEnd={e => {
+            //   if (checkOutBounds(e.nativeEvent.coordinate)) {
+            //     Platform.OS === 'android'
+            //       ? markerRef.current[idx].animateMarkerToCoordinate(
+            //           mark.coords,
+            //           200,
+            //         )
+            //       : console.log('out of bound');
+            //   } else {
+            //     dispatch(
+            //       editMarker({...mark, coords: e.nativeEvent.coordinate}),
+            //     );
+            //   }
+            // }}
+            onCalloutPress={() => markerRef.current[idx].hideCallout()}>
             <Callout
               tooltip={false}
               onPress={() => {
@@ -94,43 +154,58 @@ export const MapScreen = ({route}) => {
         ))}
 
         <Overlay
-          image={icons.house1}
+          // bearing={90}
+          image={house.image}
           bounds={[
             [
-              +(initialRegion.latitude - 0.0007).toFixed(14),
-              +(initialRegion.longitude - 0.0009).toFixed(14),
+              (+house.initialRegion.latitude - 0.002).toFixed(14),
+              (+house.initialRegion.longitude - 0.002).toFixed(14),
             ],
             [
-              +(initialRegion.latitude + 0.0009).toFixed(14),
-              +(initialRegion.longitude + 0.0009).toFixed(14),
+              (+house.initialRegion.latitude + 0.002).toFixed(14),
+              (+house.initialRegion.longitude + 0.002).toFixed(14),
             ],
           ]}
-          // bounds={[
-          //   [50.0312, 36.2214],
-          //   [50.0321, 36.223],
-          // ]}
         />
 
-        <Polyline
+        {/* <Polyline
           coordinates={[
-            calculateBounds()[0],
+            northWest,
             {
-              latitude: calculateBounds()[0].latitude,
-              longitude: calculateBounds()[1].longitude,
+              latitude: northWest.latitude,
+              longitude: southEast.longitude,
             },
-            calculateBounds()[1],
+            southEast,
             {
-              latitude: calculateBounds()[1].latitude,
-              longitude: calculateBounds()[0].longitude,
+              latitude: southEast.latitude,
+              longitude: northWest.longitude,
             },
             {
-              latitude: calculateBounds()[0].latitude,
-              longitude: calculateBounds()[0].longitude,
+              latitude: northWest.latitude,
+              longitude: northWest.longitude,
             },
           ]}
-        />
+        /> */}
+        {/* <Polyline
+          coordinates={[
+            northWest,
+            {
+              latitude: northWest.latitude,
+              longitude: southEast.longitude,
+            },
+            southEast,
+            {
+              latitude: southEast.latitude,
+              longitude: northWest.longitude,
+            },
+            {
+              latitude: northWest.latitude,
+              longitude: northWest.longitude,
+            },
+          ]}
+        /> */}
       </MapView>
-      <SideBar value={markers} onPress={handleCenter} />
+      <SideBar value={data.markers} onPress={handleCenter} />
     </View>
   );
 };

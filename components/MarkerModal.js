@@ -9,13 +9,14 @@ import {
   TextInput,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import {addMarker, editMarker, removeMarker} from '../store/markersSlice';
+import {addMarkerAsync, editMarker, removeMarker} from '../store/houseSlice';
 import {closeModal} from '../store/modalSlice';
 
 export const MarkerModal = () => {
-  const {markerId, newCoords} = useSelector(state => state.modal);
-  const visible = useSelector(state => state.modal.visible);
-  const {markers} = useSelector(state => state.markers);
+  const {markerId, newCoords, houseId, visible} = useSelector(
+    state => state.modal,
+  );
+  const {markers} = useSelector(state => state.houses);
   const dispatch = useDispatch();
 
   const [title, setTitle] = useState('');
@@ -24,24 +25,18 @@ export const MarkerModal = () => {
   const [id, setId] = useState('');
 
   useEffect(() => {
-    if (markerId) {
+    if (!!markerId) {
       const mark = markers.find(i => i.id === markerId);
       setTitle(mark.title);
       setDescription(mark.description);
       setCoords(mark.coords);
       setId(mark.id);
-    } else {
-      console.log('------', newCoords);
+    } else if (!markerId) {
       setCoords(newCoords);
     }
-  }, []);
-
-  useEffect(() => {
-    console.log('dispatch');
-  }, [dispatch]);
+  }, [markerId, newCoords]);
 
   const onSave = () => {
-    // setVisible(!visible);
     addNewMarker();
     dispatch(closeModal());
   };
@@ -49,18 +44,6 @@ export const MarkerModal = () => {
   const onDelete = id => {
     dispatch(removeMarker(id));
     dispatch(closeModal());
-  };
-
-  const openModal = (e, mark) => {
-    if (mark) {
-      setTitle(mark.title);
-      setDescription(mark.description);
-      setCoords(mark.coords);
-      setId(mark.id);
-    } else {
-      setCoords(e.nativeEvent.coordinate);
-    }
-    // setVisible(true);
   };
 
   const onCloseModal = () => {
@@ -79,7 +62,7 @@ export const MarkerModal = () => {
         coords,
         id: Date.now(),
       };
-      dispatch(addMarker(newMark));
+      dispatch(addMarkerAsync({houseId, newMark}));
     } else {
       const newMark = {
         title,
@@ -93,10 +76,6 @@ export const MarkerModal = () => {
     setDescription('');
     setCoords({});
     setId('');
-    // setEdit(false);
-    // if (calloutRef.current) {
-    //   calloutRef.current.hideCallout();
-    // }
   };
 
   return (
@@ -105,14 +84,11 @@ export const MarkerModal = () => {
       transparent={true}
       visible={visible}
       style={styles.modal}
-      onRequestClose={() => {
-        // Alert.alert('Modal has been closed.');
-        onCloseModal();
-      }}>
+      onRequestClose={() => onCloseModal()}>
       <Pressable onPress={() => onCloseModal()}>
         <View style={styles.modalView}>
           <Text style={styles.modalText}>
-            {title ? 'Edit mark' : 'Add new mark'}
+            {!!markerId ? 'Edit mark' : 'Add new mark'}
           </Text>
           <TextInput
             placeholder="title"
@@ -132,7 +108,7 @@ export const MarkerModal = () => {
               onPress={onSave}>
               <Text style={styles.textStyle}>Save Mark</Text>
             </Pressable>
-            {markerId && (
+            {!!markerId && (
               <Pressable
                 style={[styles.button, styles.buttonRemove]}
                 onPress={() => onDelete(markerId)}>
@@ -152,9 +128,6 @@ export const MarkerModal = () => {
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    // backgroundColor: 'green',
-  },
   modalView: {
     marginVertical: Dimensions.get('window').height / 3,
     marginHorizontal: 20,
@@ -175,7 +148,6 @@ const styles = StyleSheet.create({
   },
   modal: {
     flex: 1,
-    // justifyContent: 'flex-end',
   },
   button: {
     borderRadius: 20,
@@ -200,7 +172,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   modalText: {
-    // marginBottom: 15,
     textAlign: 'center',
     color: 'black',
   },

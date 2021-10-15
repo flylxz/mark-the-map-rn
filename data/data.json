@@ -1,0 +1,164 @@
+{
+  "houses": [
+    {
+      "id": "1",
+      "title": "House of Dream",
+      "image": "https://png.pngtree.com/png-clipart/20200701/original/pngtree-floor-plan-png-image_5395522.jpg",
+      "initialRegion": {
+        "latitude": 50.0314,
+        "longitude": 36.2219,
+        "latitudeDelta": 0.01,
+        "longitudeDelta": 0.01
+      },
+      "markers": [
+        {
+          "id": "1",
+          "title": "first",
+          "description": "test",
+          "coords": {
+            "latitude": 50.03263326152739,
+            "longitude": 36.223269291222095
+          }
+        },
+        {
+          "id": "2",
+          "title": "second",
+          "description": "test test",
+          "coords": {
+            "latitude": 50.03321271197493,
+            "longitude": 36.220791935920715
+          }
+        },
+        {
+          "id": "3",
+          "title": "third",
+          "description": "test test test",
+          "coords": {
+            "latitude": 50.03184343096533,
+            "longitude": 36.22232756290436
+          }
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "title": "House of Pain",
+      "image": "https://img.favpng.com/15/22/14/floor-plan-house-plan-active-adult-housing-construction-png-favpng-hQnAiQzWBmnLvyMpj2dprHdrp.jpg",
+      "initialRegion": {
+        "latitude": 50.0314,
+        "longitude": 36.2219,
+        "latitudeDelta": 0.01,
+        "longitudeDelta": 0.01
+      },
+      "markers": [
+        {
+          "id": "1",
+          "title": "aaaaaaa",
+          "description": "test",
+          "coords": {
+            "latitude": 50.03263326152739,
+            "longitude": 36.223269291222095
+          }
+        },
+        {
+          "id": " 2",
+          "title": "bbbbb",
+          "description": "test test",
+          "coords": {
+            "latitude": 50.033222711974936,
+            "longitude": 36.220791935920715
+          }
+        },
+        {
+          "id": "3",
+          "title": "cccccc",
+          "description": "test test test",
+          "coords": {
+            "latitude": 50.03184343096533,
+            "longitude": 36.22232756290436
+          }
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "title": "House of Flower",
+      "image": "https://w7.pngwing.com/pngs/136/342/png-transparent-floor-plan-house-storey-building-project-house-building-plan-schematic.png",
+      "initialRegion": {
+        "latitude": 50.0314,
+        "longitude": 36.2219,
+        "latitudeDelta": 0.01,
+        "longitudeDelta": 0.01
+      },
+      "markers": [
+        {
+          "id": "1",
+          "title": "aaaaaaa",
+          "description": "test",
+          "coords": {
+            "latitude": 50.03263326152739,
+            "longitude": 36.223269291222095
+          }
+        },
+        {
+          "id": "2",
+          "title": "bbbbb",
+          "description": "test test test",
+          "coords": {
+            "latitude": 50.033222711974936,
+            "longitude": 36.220791935920715
+          }
+        },
+        {
+          "id": "3",
+          "title": "cccccc",
+          "description": "test test test",
+          "coords": {
+            "latitude": 50.03184343096533,
+            "longitude": 36.22232756290436
+          }
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "title": "House of Fun",
+      "image": "https://e7.pngegg.com/pngimages/292/141/png-clipart-floor-plan-park-square-enterprises-llc-house-house-plan-schematic.png",
+      "initialRegion": {
+        "latitude": 50.0314,
+        "longitude": 36.2219,
+        "latitudeDelta": 0.01,
+        "longitudeDelta": 0.01
+      },
+      "markers": [
+        {
+          "id": "1",
+          "title": "aaaaaaa",
+          "description": "test",
+          "coords": {
+            "latitude": 50.03263326152739,
+            "longitude": 36.223269291222095
+          }
+        },
+        {
+          "id": "2",
+          "title": "bbbbb",
+          "description": "test test",
+          "coords": {
+            "latitude": 50.033222711974936,
+            "longitude": 36.220791935920715
+          }
+        },
+        {
+          "id": "3",
+          "title": "cccccc",
+          "description": "test test test",
+          "coords": {
+            "latitude": 50.03184343096533,
+            "longitude": 36.22232756290436
+          }
+        }
+      ]
+    }
+  ]
+}

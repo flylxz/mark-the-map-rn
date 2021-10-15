@@ -1,11 +1,9 @@
-export const chilli = require('../assets/icons/chilli.png');
-export const coriander = require('../assets/icons/coriander.png');
-export const tomato = require('../assets/icons/tomato.png');
-export const house1 = require('../assets/images/house1.png');
+const chilli = require('../assets/icons/chilli.png');
+const coriander = require('../assets/icons/coriander.png');
+const tomato = require('../assets/icons/tomato.png');
 
 export default {
   chilli,
   coriander,
   tomato,
-  house1,
 };

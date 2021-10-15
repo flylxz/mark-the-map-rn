@@ -1,36 +1,96 @@
-import {NavigationContainer} from '@react-navigation/native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   Button,
+  FlatList,
+  Image,
   Platform,
   SafeAreaView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import {TouchComponent} from '../components/TouchComponent';
+import {useGetHouseListQuery} from '../service/house';
 
 export const HomeScreen = ({navigation}) => {
-  const initialRegion = {
-    latitude: 50.0314,
-    longitude: 36.2219,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
+  const {data, error, isLoading} = useGetHouseListQuery();
+  const dispatch = useDispatch();
+  const {houses} = useSelector(state => state);
+  // console.log(data, error, isLoading);
+  // useEffect(() => {
+  //   console.log(data);
+  // }, [data]);
+
+  const renderHouseList = ({item}) => {
+    return (
+      <TouchComponent onPress={() => navigation.navigate('Map', {item})}>
+        <View style={styles.card}>
+          <View style={styles.imageContainer}>
+            <Image
+              source={{uri: item.image}}
+              resizeMode="contain"
+              style={styles.image}
+            />
+          </View>
+          <View style={styles.title}>
+            <Text>{item.title}</Text>
+          </View>
+        </View>
+      </TouchComponent>
+    );
   };
 
   return (
-    <SafeAreaView>
-      <View>
-        <Text style={{marginTop: Platform.OS === 'android' ? 250 : 0}}>
-          Home
-        </Text>
+    <SafeAreaView style={styles.screen}>
+      {error ? (
+        <>Oh no, there was an error</>
+      ) : isLoading ? (
+        <Text>Loading...</Text>
+      ) : data ? (
+        <View style={styles.list}>
+          <FlatList
+            data={data}
+            keyExtractor={item => `${item.id}`}
+            renderItem={renderHouseList}
+          />
 
-        <Button
+          {/* <Button
           title="to map"
           onPress={() => navigation.navigate('Map', {initialRegion})}
-        />
-      </View>
+        /> */}
+        </View>
+      ) : null}
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
+  list: {
+    flex: 1,
+    // alignItems: 'center',
+    backgroundColor: '#e3e3e3',
+  },
+  card: {
+    minHeight: 300,
+    backgroundColor: 'white',
+    marginBottom: 20,
+    marginHorizontal: 20,
+    borderRadius: 10,
+  },
+  imageContainer: {
+    width: '100%',
+    height: 300,
+  },
+  image: {
+    width: '100%',
+    height: 300,
+  },
+  title: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+});

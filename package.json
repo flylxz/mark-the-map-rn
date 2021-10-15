@@ -7,7 +7,8 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "serve": "json-server --watch data/data.json -H 10.0.1.50"
   },
   "dependencies": {
     "@react-navigation/native": "^6.0.6",
