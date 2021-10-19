@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Button,
   FlatList,
@@ -12,15 +12,10 @@ import {
 import {useDispatch, useSelector} from 'react-redux';
 import {TouchComponent} from '../components/TouchComponent';
 import {useGetHouseListQuery} from '../service/house';
+import {fetchHousesAsync} from '../store/houseSlice';
 
 export const HomeScreen = ({navigation}) => {
   const {data, error, isLoading} = useGetHouseListQuery();
-  const dispatch = useDispatch();
-  const {houses} = useSelector(state => state);
-  // console.log(data, error, isLoading);
-  // useEffect(() => {
-  //   console.log(data);
-  // }, [data]);
 
   const renderHouseList = ({item}) => {
     return (
@@ -29,6 +24,7 @@ export const HomeScreen = ({navigation}) => {
           <View style={styles.imageContainer}>
             <Image
               source={{uri: item.image}}
+              // source={require('../assets/images/003.webp')}
               resizeMode="contain"
               style={styles.image}
             />
@@ -43,36 +39,37 @@ export const HomeScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.screen}>
-      {error ? (
-        <>Oh no, there was an error</>
-      ) : isLoading ? (
-        <Text>Loading...</Text>
-      ) : data ? (
-        <View style={styles.list}>
-          <FlatList
-            data={data}
-            keyExtractor={item => `${item.id}`}
-            renderItem={renderHouseList}
-          />
-
-          {/* <Button
-          title="to map"
-          onPress={() => navigation.navigate('Map', {initialRegion})}
-        /> */}
-        </View>
-      ) : null}
+      <View>
+        {!!error ? (
+          <Text>Oh no, there was an error</Text>
+        ) : isLoading ? (
+          <Text>Loading...</Text>
+        ) : !!data ? (
+          <View style={styles.list}>
+            <FlatList
+              data={data}
+              keyExtractor={item => `${item.id}`}
+              renderItem={renderHouseList}
+            />
+          </View>
+        ) : (
+          <Text>nothing</Text>
+        )}
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
+    // flex: 1,
+    paddingBottom: 150,
   },
   list: {
-    flex: 1,
+    // flex: 1,
     // alignItems: 'center',
     backgroundColor: '#e3e3e3',
+    // marginBottom: 150,
   },
   card: {
     minHeight: 300,

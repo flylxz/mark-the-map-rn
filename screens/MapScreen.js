@@ -1,5 +1,6 @@
+import {NavigationContainer} from '@react-navigation/native';
 import React, {useEffect, useRef, useState} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import {Animated, Platform, StyleSheet, Text, View} from 'react-native';
 
 import MapView, {
   Marker,
@@ -7,38 +8,36 @@ import MapView, {
   PROVIDER_GOOGLE,
   Callout,
   Polyline,
+  AnimatedRegion,
 } from 'react-native-maps';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {SideBar} from '../components/SideBar';
+import {useGetHouseByIdQuery, useUpdateMarkerMutation} from '../service/house';
 
-import images from '../constants/images';
-import {useGetHouseByIdQuery} from '../service/house';
-import {editMarker} from '../store/houseSlice';
-import {openModalAdd, openModalEdit} from '../store/modalSlice';
-
-export const MapScreen = ({route}) => {
+export const MapScreen = ({route, navigation}) => {
   const house = route.params.item;
-  const {data, error, isLoading} = useGetHouseByIdQuery(house.id);
-
-  // const {houses} = useSelector(state => state.houses);
-  const dispatch = useDispatch();
+  const {data, error, isLoading} = useGetHouseByIdQuery(house.id, {
+    // pollingInterval: 1000,
+  });
+  const [updateMarker, {isLoading: isUpdating}] = useUpdateMarkerMutation();
 
   const mapRef = useRef(null);
   const markerRef = useRef([]);
 
-  // const [[northWest, southEast], setBounds] = useState();
   const [[northWest, southEast], setBounds] = useState([]);
+
+  // const meterToDegree = meter => (meter / 111000).toFixed(14);
 
   const calculateBounds = () => {
     return [
       {
-        latitude: (+house?.initialRegion?.latitude + 0.002).toFixed(14),
-        longitude: (+house?.initialRegion?.longitude - 0.002).toFixed(14),
+        latitude: +(+house?.initialRegion?.latitude + 0.002).toFixed(14),
+        longitude: +(+house?.initialRegion?.longitude - 0.004).toFixed(14),
       },
       {
-        latitude: (+house?.initialRegion?.latitude - 0.002).toFixed(14),
-        longitude: (+house?.initialRegion?.longitude + 0.002).toFixed(14),
+        latitude: +(+house?.initialRegion?.latitude - 0.002).toFixed(14),
+        longitude: +(+house?.initialRegion?.longitude + 0.004).toFixed(14),
       },
     ];
   };
@@ -78,134 +77,120 @@ export const MapScreen = ({route}) => {
     });
   };
 
-  if (isLoading) {
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View>
-        <Text>Error...</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.screen}>
-      <MapView
-        userInterfaceStyle="dark"
-        customMapStyle={mapStyle}
-        ref={map => (mapRef.current = map)}
-        style={styles.screen}
-        mapType="standard"
-        provider={PROVIDER_GOOGLE}
-        initialRegion={house.initialRegion}
-        // onMapReady={() => mapRef.current.setMapBoundaries(...calculateBounds())}
-        // onMapReady={() =>
-        //   mapRef.current.setMapBoundaries([northWest, southEast])
-        // }
-        minZoomLevel={17}
-        onLongPress={e => {
-          if (checkOutBounds(e.nativeEvent.coordinate)) {
-            console.log('out of bounds');
-          } else {
-            dispatch(
-              openModalAdd({id: house.id, coords: e.nativeEvent.coordinate}),
-            );
+      {!!error ? (
+        <Text>Oh no, there was an error</Text>
+      ) : isLoading ? (
+        <Text>Loading...</Text>
+      ) : !!data ? (
+        <MapView
+          userInterfaceStyle="dark"
+          customMapStyle={mapStyle}
+          ref={map => (mapRef.current = map)}
+          style={styles.screen}
+          mapType="standard"
+          provider={PROVIDER_GOOGLE}
+          initialRegion={house.initialRegion}
+          onMapReady={() =>
+            mapRef.current.setMapBoundaries(...calculateBounds())
           }
-        }}
-        zoomControlEnabled={true}
-        rotateEnabled={false}>
-        {house.markers.map((mark, idx) => (
-          <Marker
-            key={mark.id}
-            ref={el => (markerRef.current[idx] = el)}
-            coordinate={mark.coords}
-            // flat={true}
-            title={mark.title}
-            description={mark.description}
-            draggable
-            // onDragEnd={e => {
-            //   if (checkOutBounds(e.nativeEvent.coordinate)) {
-            //     Platform.OS === 'android'
-            //       ? markerRef.current[idx].animateMarkerToCoordinate(
-            //           mark.coords,
-            //           200,
-            //         )
-            //       : console.log('out of bound');
-            //   } else {
-            //     dispatch(
-            //       editMarker({...mark, coords: e.nativeEvent.coordinate}),
-            //     );
-            //   }
-            // }}
-            onCalloutPress={() => markerRef.current[idx].hideCallout()}>
-            <Callout
-              tooltip={false}
-              onPress={() => {
-                dispatch(openModalEdit(mark.id));
+          minZoomLevel={15}
+          onLongPress={e => {
+            if (checkOutBounds(e.nativeEvent.coordinate)) {
+              console.warn('out of bounds');
+            } else {
+              navigation.navigate('AddEdit', {
+                house: data,
+                newCoords: e.nativeEvent.coordinate,
+              });
+            }
+          }}
+          zoomControlEnabled={true}
+          rotateEnabled={false}>
+          {data.markers.map((mark, idx) => (
+            <Marker
+              key={mark.id}
+              ref={el => (markerRef.current[idx] = el)}
+              coordinate={mark.coords}
+              // flat={true}
+              title={mark.title}
+              description={mark.description}
+              draggable
+              onDragEnd={e => {
+                if (checkOutBounds(e.nativeEvent.coordinate)) {
+                  Platform.OS === 'android'
+                    ? markerRef.current[idx].animateMarkerToCoordinate(
+                        mark.coords,
+                        200,
+                      )
+                    : console.log('out of bound');
+                } else {
+                  updateMarker({
+                    id: data.id,
+                    body: {
+                      ...data,
+                      markers: data.markers.map(m =>
+                        m.id === mark.id
+                          ? {...m, coords: e.nativeEvent.coordinate}
+                          : m,
+                      ),
+                    },
+                  });
+                }
               }}
-            />
-          </Marker>
-        ))}
+              onCalloutPress={() => markerRef.current[idx].hideCallout()}>
+              <Callout
+                tooltip={false}
+                onPress={() =>
+                  navigation.navigate('AddEdit', {
+                    markerId: mark.id,
+                    house: data,
+                  })
+                }
+              />
+            </Marker>
+          ))}
 
-        <Overlay
-          // bearing={90}
-          image={house.image}
-          bounds={[
-            [
-              (+house.initialRegion.latitude - 0.002).toFixed(14),
-              (+house.initialRegion.longitude - 0.002).toFixed(14),
-            ],
-            [
-              (+house.initialRegion.latitude + 0.002).toFixed(14),
-              (+house.initialRegion.longitude + 0.002).toFixed(14),
-            ],
-          ]}
-        />
+          <Overlay
+            // bearing={90}
+            image={house.image}
+            // image={require('../assets/images/this.png')}
+            bounds={[
+              [
+                +(+house?.initialRegion.latitude - 0.002).toFixed(14),
+                +(+house?.initialRegion.longitude - 0.004).toFixed(14),
+              ],
+              [
+                +(+house.initialRegion.latitude + 0.002).toFixed(14),
+                +(+house.initialRegion.longitude + 0.004).toFixed(14),
+              ],
+            ]}
+          />
 
-        {/* <Polyline
-          coordinates={[
-            northWest,
-            {
-              latitude: northWest.latitude,
-              longitude: southEast.longitude,
-            },
-            southEast,
-            {
-              latitude: southEast.latitude,
-              longitude: northWest.longitude,
-            },
-            {
-              latitude: northWest.latitude,
-              longitude: northWest.longitude,
-            },
-          ]}
-        /> */}
-        {/* <Polyline
-          coordinates={[
-            northWest,
-            {
-              latitude: northWest.latitude,
-              longitude: southEast.longitude,
-            },
-            southEast,
-            {
-              latitude: southEast.latitude,
-              longitude: northWest.longitude,
-            },
-            {
-              latitude: northWest.latitude,
-              longitude: northWest.longitude,
-            },
-          ]}
-        /> */}
-      </MapView>
-      <SideBar value={data.markers} onPress={handleCenter} />
+          {/* <Polyline
+            coordinates={[
+              northWest,
+              {
+                latitude: northWest?.latitude,
+                longitude: southEast?.longitude,
+              },
+              southEast,
+              {
+                latitude: southEast?.latitude,
+                longitude: northWest?.longitude,
+              },
+              {
+                latitude: northWest?.latitude,
+                longitude: northWest?.longitude,
+              },
+            ]}
+          /> */}
+        </MapView>
+      ) : (
+        <Text>unexpected</Text>
+      )}
+      {data && <SideBar value={data.markers} onPress={handleCenter} />}
     </View>
   );
 };

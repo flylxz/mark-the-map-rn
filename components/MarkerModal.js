@@ -16,7 +16,8 @@ export const MarkerModal = () => {
   const {markerId, newCoords, houseId, visible} = useSelector(
     state => state.modal,
   );
-  const {markers} = useSelector(state => state.houses);
+  const houses = useSelector(state => state.houses);
+  console.log('houses===', houses);
   const dispatch = useDispatch();
 
   const [title, setTitle] = useState('');

@@ -4,6 +4,10 @@
       "id": "1",
       "title": "House of Dream",
       "image": "https://png.pngtree.com/png-clipart/20200701/original/pngtree-floor-plan-png-image_5395522.jpg",
+      "dimensions": {
+        "x": 200,
+        "y": 100
+      },
       "initialRegion": {
         "latitude": 50.0314,
         "longitude": 36.2219,
@@ -25,8 +29,8 @@
           "title": "second",
           "description": "test test",
           "coords": {
-            "latitude": 50.03321271197493,
-            "longitude": 36.220791935920715
+            "longitude": 36.219784431159496,
+            "latitude": 50.031719243675546
           }
         },
         {
@@ -37,6 +41,24 @@
             "latitude": 50.03184343096533,
             "longitude": 36.22232756290436
           }
+        },
+        {
+          "title": "121",
+          "description": "D213d213dtest",
+          "coords": {
+            "latitude": 50.03095252348364,
+            "longitude": 36.22230235487223
+          },
+          "id": 1634569048416
+        },
+        {
+          "title": "1111111",
+          "description": "2222222",
+          "coords": {
+            "latitude": 50.0321934841387,
+            "longitude": 36.2209602445364
+          },
+          "id": 1634643187778
         }
       ]
     },
@@ -44,6 +66,10 @@
       "id": "2",
       "title": "House of Pain",
       "image": "https://img.favpng.com/15/22/14/floor-plan-house-plan-active-adult-housing-construction-png-favpng-hQnAiQzWBmnLvyMpj2dprHdrp.jpg",
+      "dimensions": {
+        "x": 180,
+        "y": 200
+      },
       "initialRegion": {
         "latitude": 50.0314,
         "longitude": 36.2219,
@@ -56,8 +82,8 @@
           "title": "aaaaaaa",
           "description": "test",
           "coords": {
-            "latitude": 50.03263326152739,
-            "longitude": 36.223269291222095
+            "longitude": 36.22474852949381,
+            "latitude": 50.03085302125799
           }
         },
         {
@@ -65,8 +91,8 @@
           "title": "bbbbb",
           "description": "test test",
           "coords": {
-            "latitude": 50.033222711974936,
-            "longitude": 36.220791935920715
+            "longitude": 36.22201334685088,
+            "latitude": 50.03118103322581
           }
         },
         {
@@ -74,8 +100,8 @@
           "title": "cccccc",
           "description": "test test test",
           "coords": {
-            "latitude": 50.03184343096533,
-            "longitude": 36.22232756290436
+            "longitude": 36.22359383851289,
+            "latitude": 50.03283268912368
           }
         }
       ]
@@ -84,6 +110,10 @@
       "id": "3",
       "title": "House of Flower",
       "image": "https://w7.pngwing.com/pngs/136/342/png-transparent-floor-plan-house-storey-building-project-house-building-plan-schematic.png",
+      "dimensions": {
+        "x": 300,
+        "y": 300
+      },
       "initialRegion": {
         "latitude": 50.0314,
         "longitude": 36.2219,
@@ -105,8 +135,8 @@
           "title": "bbbbb",
           "description": "test test test",
           "coords": {
-            "latitude": 50.033222711974936,
-            "longitude": 36.220791935920715
+            "latitude": 50.03131757858479,
+            "longitude": 36.220689341425896
           }
         },
         {

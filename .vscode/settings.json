@@ -1,3 +1,4 @@
 {
-  "cSpell.words": ["Pressable", "reduxjs"]
+  "cSpell.words": ["Pressable", "reduxjs"],
+  "compile-hero.disable-compile-files-on-did-save-code": true
 }
