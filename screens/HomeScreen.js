@@ -45,8 +45,9 @@ export const HomeScreen = ({navigation}) => {
         ) : isLoading ? (
           <Text>Loading...</Text>
         ) : !!data ? (
-          <View style={styles.list}>
+          <View>
             <FlatList
+              contentContainerStyle={styles.list}
               data={data}
               keyExtractor={item => `${item.id}`}
               renderItem={renderHouseList}
@@ -62,13 +63,14 @@ export const HomeScreen = ({navigation}) => {
 
 const styles = StyleSheet.create({
   screen: {
-    // flex: 1,
-    paddingBottom: 150,
+    flex: 1,
   },
   list: {
     // flex: 1,
     // alignItems: 'center',
     backgroundColor: '#e3e3e3',
+    paddingTop: 20,
+    paddingBottom: 50,
     // marginBottom: 150,
   },
   card: {

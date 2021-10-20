@@ -122,7 +122,7 @@ export const MapScreen = ({route, navigation}) => {
                   Platform.OS === 'android'
                     ? markerRef.current[idx].animateMarkerToCoordinate(
                         mark.coords,
-                        200,
+                        500,
                       )
                     : console.log('out of bound');
                 } else {
